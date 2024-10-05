@@ -21,9 +21,18 @@ namespace WebApplicationOrder.Controllers
         }
 
         // GET: Items
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Items.ToListAsync());
+            var items = await _context.Items.ToListAsync();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                //items = items.Where(s => s.ItemDesc.ToLower().Contains(searchString)).ToList(); 
+                items = items.Where(s => s.ItemDesc.ToLower().StartsWith(searchString)).ToList(); 
+             
+            }
+            return View(items);
         }
 
         // GET: Items/Details/5
