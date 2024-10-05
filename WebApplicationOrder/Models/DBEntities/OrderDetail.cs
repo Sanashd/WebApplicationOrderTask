@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace WebApplicationOrder.Models.DBEntities
 {
@@ -10,13 +11,16 @@ namespace WebApplicationOrder.Models.DBEntities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
         public int OrderedDetailsId { get; set; }
+
+        [DisplayName("Master Order ID")]
         public int OrderId { get; set; } // foriegn key for ordermaster
 
         [ForeignKey("OrderId")]
-        public virtual OrderMaster OrderMaster { get; set; } 
+        public virtual OrderMaster OrderMaster { get; set; }
 
-
+     
         public int ItemId { get; set; } // Foreign key for Item
+
 
         [ForeignKey("ItemId")]
         public virtual Item Item { get; set; } // Reference to Item

@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Add Order Detail</a>
+    <a asp-action="Create" class="btn btn-success btn-sm">Add Order Details</a>
 </p>
 <table class="table">
     <thead>
@@ -19,7 +19,10 @@
                 @Html.DisplayNameFor(model => model.OrderId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Item)
+                @Html.DisplayNameFor(model => model.Item.ItemId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item.ItemCost)
             </th>
           
             <th>
@@ -43,6 +46,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Item.ItemId)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.ItemCost)
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
@@ -50,9 +56,9 @@
                 @Html.DisplayFor(modelItem => item.Cost)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.OrderedDetailsId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderedDetailsId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderedDetailsId">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.OrderedDetailsId" class="btn btn-primary btn-sm">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.OrderedDetailsId" class="btn btn-info btn-sm">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.OrderedDetailsId" class="btn btn-danger btn-sm">Delete</a>
             </td>
         </tr>
 }
