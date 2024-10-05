@@ -1,0 +1,82 @@
+﻿@model WebApplicationOrder.Models.DBEntities.OrderDetail
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create Order Details</h1>
+
+<h4>OrderDetail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="orderDetailForm">
+          
+
+            <div class="form-group">
+                <label asp-for="OrderId" class="control-label"></label>
+                <select asp-for="OrderId" class="form-control" asp-items="@ViewBag.OrderId"></select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ItemId" class="control-label"></label>
+                <select asp-for="ItemId" class="form-control" asp-items="@ViewBag.ItemId" id="itemSelect"></select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" id="quantityInput" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+          @*   <div class="form-group">
+                <label asp-for="Cost" class="control-label"></label>
+                <input asp-for="Cost" class="form-control" />
+                <span asp-validation-for="Cost" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label>Cost</label>
+                <input type="text" class="form-control" id="costInput" readonly />
+                <input type="hidden" asp-for="Cost" id="hiddenCostInput" /> 
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#quantityInput').on('input', function () {
+                var quantity = $(this).val();
+                var itemId = $('#itemSelect').val();
+
+                if (itemId && quantity) {
+                    $.ajax({
+                        url: '@Url.Action("GetItemCost", "Items")', // Adjust based on your ItemsController
+                        type: 'GET',
+                        data: { itemId: itemId },
+                        success: function (data) {
+                            var cost = data.cost; // Assuming the API returns the cost
+                            var totalCost = (cost * quantity).toFixed(2);
+                            $('#costInput').val(totalCost);
+                            $('#hiddenCostInput').val(totalCost); // Set the hidden input value
+                        }
+                    });
+                } else {
+                    $('#costInput').val('0.00');
+                    $('#hiddenCostInput').val('0.00'); // Reset hidden input if no item or quantity
+                }
+            });
+        });
+    </script>
+}
