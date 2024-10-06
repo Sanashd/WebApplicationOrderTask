@@ -16,6 +16,10 @@
                 <label asp-for="OrderId" class="control-label"></label>
                 <select asp-for="OrderId" class="form-control" asp-items="@ViewBag.OrderId"></select>
             </div>
+              <div class="form-group">
+                <label>Customer ID</label>
+                <input type="text" class="form-control" id="customerIdInput" readonly />
+            </div>
 
             <div class="form-group">
                 <label asp-for="ItemId" class="control-label"></label>
@@ -55,27 +59,44 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#quantityInput').on('input', function () {
-                var quantity = $(this).val();
-                var itemId = $('#itemSelect').val();
-
-                if (itemId && quantity) {
+             $('#orderSelect').change(function () {
+                var orderId = $(this).val();
+                if (orderId) {
                     $.ajax({
-                        url: '@Url.Action("GetItemCost", "Items")', // Adjust based on your ItemsController
+                        url: '@Url.Action("GetCustomerId", "OrderDetails")',
                         type: 'GET',
-                        data: { itemId: itemId },
+                        data: { orderId: orderId },
                         success: function (data) {
-                            var cost = data.cost; // Assuming the API returns the cost
-                            var totalCost = (cost * quantity).toFixed(2);
-                            $('#costInput').val(totalCost);
-                            $('#hiddenCostInput').val(totalCost); // Set the hidden input value
+                            $('#customerIdInput').val(data.customerId); // Update the Customer ID field
                         }
                     });
                 } else {
-                    $('#costInput').val('0.00');
-                    $('#hiddenCostInput').val('0.00'); // Reset hidden input if no item or quantity
+                    $('#customerIdInput').val(''); // Clear if no order is selected
                 }
             });
-        });
+
+                // Fetch item cost and calculate total when quantity or item changes
+                $('#quantityInput, #itemSelect').on('input change', function () {
+                    var quantity = $('#quantityInput').val();
+                    var itemId = $('#itemSelect').val();
+
+                    if (itemId && quantity) {
+                        $.ajax({
+                            url: '@Url.Action("GetItemCost", "Items")',
+                            type: 'GET',
+                            data: { itemId: itemId },
+                            success: function (data) {
+                                var cost = data.cost; // Get item cost from API
+                                var totalCost = (cost * quantity).toFixed(2);
+                                $('#costInput').val(totalCost); // Display total cost
+                                $('#hiddenCostInput').val(totalCost); // Set hidden input for model binding
+                            }
+                        });
+                    } else {
+                        $('#costInput').val('0.00');
+                        $('#hiddenCostInput').val('0.00');
+                    }
+                });
+            });
     </script>
 }

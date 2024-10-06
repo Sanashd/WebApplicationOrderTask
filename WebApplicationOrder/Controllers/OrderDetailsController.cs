@@ -20,11 +20,28 @@ namespace WebApplicationOrder.Controllers
         }
 
         // GET: OrderDetails
-        public async Task<IActionResult> Index()
+      
+        public async Task<IActionResult> Index(string searchCustomerinOrder)
         {
-            var itemDbContext = _context.OrderDetails.Include(o => o.Item).Include(o => o.OrderMaster);
-            return View(await itemDbContext.ToListAsync());
+
+            var orderDetails = _context.OrderDetails
+                .Include(o => o.Item)
+                .Include(o => o.OrderMaster).AsQueryable();
+
+
+            if (!String.IsNullOrEmpty(searchCustomerinOrder))
+            {
+
+                if (int.TryParse(searchCustomerinOrder, out int customerId))
+                {
+                    orderDetails = orderDetails.Where(o=>o.OrderMaster.CustomerID == customerId);
+                }
+            }
+
+
+            return View(await orderDetails.ToListAsync());
         }
+
 
         // GET: OrderDetails/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -51,7 +68,7 @@ namespace WebApplicationOrder.Controllers
         {
             // Populate OrderId and ItemId for the dropdowns
             ViewData["OrderId"] = new SelectList(_context.OrderMasters, "OrderId", "OrderId");
-            ViewData["ItemId"] = new SelectList(_context.Items, "ItemId", "ItemId");
+            ViewData["ItemId"] = new SelectList(_context.Items, "ItemId", "ItemDesc");
             return View();
         }
 
@@ -86,7 +103,7 @@ namespace WebApplicationOrder.Controllers
             {
                 return NotFound();
             }
-            ViewData["ItemId"] = new SelectList(_context.Items, "ItemId", "ItemId", orderDetail.ItemId);
+            ViewData["ItemId"] = new SelectList(_context.Items, "ItemId", "ItemDesc", orderDetail.ItemId);
             ViewData["OrderId"] = new SelectList(_context.OrderMasters, "OrderId", "OrderId", orderDetail.OrderId);
             return View(orderDetail);
         }
@@ -94,6 +111,8 @@ namespace WebApplicationOrder.Controllers
         // POST: OrderDetails/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("OrderedDetailsId,OrderId,ItemId,Quantity,Cost")] OrderDetail orderDetail)
@@ -107,6 +126,14 @@ namespace WebApplicationOrder.Controllers
             {
                 try
                 {
+                    //Fetch the latest cost for the item
+
+                           var item = await _context.Items.FindAsync(orderDetail.ItemId);
+                    if (item != null)
+                    {
+                        // Update cost based on the item price and quantity
+                        orderDetail.Cost = item.ItemCost * orderDetail.Quantity;
+                    }
                     _context.Update(orderDetail);
                     await _context.SaveChangesAsync();
                 }
@@ -128,6 +155,23 @@ namespace WebApplicationOrder.Controllers
             return View(orderDetail);
         }
 
+
+
+
+
+        public async Task<IActionResult> GetCustomerId(int orderId)
+        {
+            var orderMaster = await _context.OrderMasters.FindAsync(orderId);
+            if (orderMaster != null)
+            {
+                return Json(new { customerId = orderMaster.CustomerID });
+
+            }
+            return Json(new { customerId = " " });
+
+
+        }
+
         // GET: OrderDetails/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -146,6 +190,7 @@ namespace WebApplicationOrder.Controllers
             }
 
             return View(orderDetail);
+
         }
 
         // POST: OrderDetails/Delete/5

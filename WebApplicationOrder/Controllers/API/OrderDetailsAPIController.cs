@@ -21,14 +21,23 @@ namespace WebApplicationOrder.Controllers.API
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDetail>>> GetOrderDetails()
         {
-            return await _context.OrderDetails.ToListAsync();
+           
+            var orderDetails = await _context.OrderDetails
+                                             .Include(od => od.OrderMaster)
+                                             .Include(od => od.Item)       
+                                             .ToListAsync();
+
+            return orderDetails;
         }
 
         // GET: api/orderDetails/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDetail>> GetOrderDetail(int id)
         {
-            var orderDetail = await _context.OrderDetails.FindAsync(id);
+            var orderDetail = await _context.OrderDetails
+                .Include(od => od.OrderMaster) 
+                                    .Include(od => od.Item)        
+                                    .FirstOrDefaultAsync(od => od.OrderedDetailsId == id); 
             if (orderDetail == null)
             {
                 return NotFound();

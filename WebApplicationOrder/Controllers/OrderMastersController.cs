@@ -24,19 +24,19 @@ namespace WebApplicationOrder.Controllers
      
         public async Task<IActionResult> Index(string searchCustomer)
         {
-            // Start with an IQueryable query
+            
             var orderMasters = _context.OrderMasters.AsQueryable();
 
             if (!String.IsNullOrEmpty(searchCustomer))
             {
-                // Convert and filter directly in the query
+               
                 if (int.TryParse(searchCustomer, out int customerId))
                 {
                     orderMasters = orderMasters.Where(o => o.CustomerID == customerId);
                 }
             }
 
-            // Only execute the query here, after filtering
+           
             return View(await orderMasters.ToListAsync());
         }
 
