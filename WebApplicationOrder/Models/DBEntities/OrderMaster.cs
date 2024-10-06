@@ -20,9 +20,6 @@ namespace WebApplicationOrder.Models.DBEntities
         [DisplayName("Order Amount")]
         public decimal OrderedAmount { get; set; }
 
-        // This collection should not be marked as required, allowing an OrderMaster to be created without details
-      //  public  ICollection<OrderDetail> OrderDetails { get; set; } 
-
 
 
     }

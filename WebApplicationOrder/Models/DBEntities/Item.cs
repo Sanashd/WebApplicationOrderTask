@@ -15,7 +15,5 @@ namespace WebApplicationOrder.Models.DBEntities
         [DisplayName("Item Cost")]
         public decimal ItemCost { get; set; }
 
-        // Navigation property for OrderDetails
-        //public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
     }
 }

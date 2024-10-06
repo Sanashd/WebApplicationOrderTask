@@ -23,7 +23,7 @@ namespace WebApplicationOrder.Models.DBEntities
 
 
         [ForeignKey("ItemId")]
-        public virtual Item Item { get; set; } // Reference to Item
+        public virtual Item Item { get; set; } 
 
         public int Quantity { get; set; }
         public decimal Cost { get; set; }
