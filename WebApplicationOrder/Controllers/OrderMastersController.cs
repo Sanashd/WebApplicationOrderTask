@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WebApplicationOrder.DAL;
 using WebApplicationOrder.Models.DBEntities;
 
@@ -20,9 +21,23 @@ namespace WebApplicationOrder.Controllers
         }
 
         // GET: OrderMasters
-        public async Task<IActionResult> Index()
+     
+        public async Task<IActionResult> Index(string searchCustomer)
         {
-            return View(await _context.OrderMasters.ToListAsync());
+            // Start with an IQueryable query
+            var orderMasters = _context.OrderMasters.AsQueryable();
+
+            if (!String.IsNullOrEmpty(searchCustomer))
+            {
+                // Convert and filter directly in the query
+                if (int.TryParse(searchCustomer, out int customerId))
+                {
+                    orderMasters = orderMasters.Where(o => o.CustomerID == customerId);
+                }
+            }
+
+            // Only execute the query here, after filtering
+            return View(await orderMasters.ToListAsync());
         }
 
         // GET: OrderMasters/Details/5
